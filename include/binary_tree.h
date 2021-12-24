@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <math.h>
 
@@ -24,3 +25,6 @@ bool BinaryTree_Remove(struct BinaryTree *tree, uint64_t hash);
 bool BinaryTree_RemoveNode(struct BinaryTree *tree, struct BinaryTreeNode *node);
 bool BinaryTree_FindMax(struct BinaryTreeNode *node, struct BinaryTreeNode **ret);
 bool BinaryTree_FindMin(struct BinaryTreeNode *node, struct BinaryTreeNode **ret);
+
+void BinaryTree_Print_MidOrder(struct BinaryTreeNode *node);
+bool BinaryTree_Check(struct BinaryTreeNode *node);

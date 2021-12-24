@@ -7,16 +7,25 @@ int main (int argc, char **argv) {
   struct BinaryTree tree;
   memset(&tree, 0, sizeof(tree));
 
-  BinaryTree_Insert(&tree, 16);
-  BinaryTree_Insert(&tree, 56);
-  BinaryTree_Insert(&tree, 75);
-  BinaryTree_Insert(&tree, 3);
-  BinaryTree_Insert(&tree, 5);
-  BinaryTree_Insert(&tree, 8);
-  BinaryTree_Insert(&tree, 18);
-  BinaryTree_Insert(&tree, 69);
-  BinaryTree_Insert(&tree, 55);
-  BinaryTree_Insert(&tree, 1);
+  uint64_t numbers[4096];
+  uint64_t tmp;
+  for (int i = 0; i < 4096; ++i) {
+    tmp = rand();
+    numbers[i] = tmp;
+    BinaryTree_Insert(&tree, tmp);
+  }
+
+  BinaryTree_Print_MidOrder(tree.root);
+  if (!BinaryTree_Check(tree.root)) {
+    printf("Check failed!");
+  }
+
+  for (int i = 0; i < 1024; ++i) {
+    BinaryTree_Remove(&tree, numbers[rand() % 4096]);
+    if (!BinaryTree_Check(tree.root)) {
+      printf("Check failed!");
+    }
+  }
 
   return 0;
 }
