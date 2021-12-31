@@ -33,7 +33,7 @@ bool BinaryTree_InternalFindPosition(struct BinaryTreeNode *node,  uint64_t hash
   }
 }
 
-static inline struct BinaryTreeNode **BinaryTree_GetParentUpdatePosition(struct BinaryTree *tree, struct BinaryTreeNode *node) {
+struct BinaryTreeNode **BinaryTree_GetParentUpdatePosition(struct BinaryTree *tree, struct BinaryTreeNode *node) {
   if (node->parent != NULL) {
     if (node->parent->left == node) {
       return &node->parent->left;

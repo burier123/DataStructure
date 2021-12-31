@@ -26,5 +26,7 @@ void BinaryTree_SingleRotate_Right(struct BinaryTree *tree, struct BinaryTreeNod
 void BinaryTree_DoubleRotate_Left(struct BinaryTree *tree, struct BinaryTreeNode **top_node);
 void BinaryTree_DoubleRotate_Right(struct BinaryTree *tree, struct BinaryTreeNode **top_node);
 
+struct BinaryTreeNode **BinaryTree_GetParentUpdatePosition(struct BinaryTree *tree, struct BinaryTreeNode *node);
+
 void BinaryTree_Print_MidOrder(struct BinaryTreeNode *node);
 bool BinaryTree_Check(struct BinaryTreeNode *node);

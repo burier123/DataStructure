@@ -17,5 +17,7 @@ struct AVLTreeNode {
 };
 
 bool AVLTree_InsertNode(struct AVLTree *tree, struct AVLTreeNode *node);
-bool AVLTree_Insert(struct AVLTree *tree, uint64_t hash);
+struct AVLTreeNode* AVLTree_Insert(struct AVLTree *tree, uint64_t hash);
 bool AVLTree_RemoveNode(struct AVLTree *tree, struct AVLTreeNode *node);
+
+bool AVLTree_CheckBalance(struct AVLTreeNode *node, int *height);
