@@ -1,5 +1,6 @@
 #include "avl_tree.h"
 #include "binary_tree.h"
+#include "rb_tree.h"
 
 int main (int argc, char **argv) {
   struct AVLTree tree;

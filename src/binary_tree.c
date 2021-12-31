@@ -105,6 +105,8 @@ bool BinaryTree_InsertNode(struct BinaryTree *tree, struct BinaryTreeNode *node)
     pos->right = node;
   }
   node->parent = pos;
+  node->left = NULL;
+  node->right = NULL;
   ++tree->size;
   return true;
 }
