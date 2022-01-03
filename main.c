@@ -3,7 +3,7 @@
 #include "rb_tree.h"
 
 int main (int argc, char **argv) {
-  struct AVLTree tree;
+  /*struct AVLTree tree;
   memset(&tree, 0, sizeof(tree));
 
   uint64_t numbers[4096];
@@ -52,7 +52,7 @@ int main (int argc, char **argv) {
   }
 
 
-  /*AVLTree_Insert(&tree, 3);
+  AVLTree_Insert(&tree, 3);
   AVLTree_Insert(&tree, 2);
   AVLTree_Insert(&tree, 1);
   AVLTree_Insert(&tree, 4);
@@ -69,6 +69,21 @@ int main (int argc, char **argv) {
   AVLTree_Insert(&tree, 8);
 
   AVLTree_RemoveNode(&tree, test);*/
+
+  struct RBTree tree;
+  memset(&tree, 0, sizeof(tree));
+
+  struct RBTreeNode *nodes[4096];
+  int n;
+  for (int i = 0; i < 4096; ++i) {
+    nodes[i] = RBTree_Insert(&tree, rand());
+    if (!BinaryTree_Check(tree.root)) {
+      printf("Check failed!\n");
+    }
+    if (!RBTree_Check(tree.root, &n)) {
+      printf("RBTree balance check failed! height:%d\n", n);
+    }
+  }
 
   return 0;
 }
