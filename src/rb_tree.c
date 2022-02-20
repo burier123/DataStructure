@@ -6,6 +6,8 @@
 
 CREATE_MEMORY_POOL(RBTreeNode, 1024)
 
+#define RBTREENODE_CAST(node) ((struct RBTreeNode *)(node))
+
 static inline void RBTree_InternalBalanceNode(struct RBTree *tree, struct RBTreeNode *parent, struct RBTreeNode *child) {
   struct RBTreeNode *grand_parent = (struct RBTreeNode *) parent->bt_node.parent;
   if (grand_parent->bt_node.left == parent) {
@@ -22,8 +24,8 @@ static inline void RBTree_InternalBalanceNode(struct RBTree *tree, struct RBTree
     }
   }
   grand_parent->color = BLACK;
-  ((struct RBTreeNode *)(grand_parent->bt_node.left))->color = RED;
-  ((struct RBTreeNode *)(grand_parent->bt_node.right))->color = RED;
+  RBTREENODE_CAST(grand_parent->bt_node.left)->color = RED;
+  RBTREENODE_CAST(grand_parent->bt_node.right)->color = RED;
 
 }
 
@@ -45,8 +47,8 @@ bool RBTree_InsertNode(struct RBTree *tree, struct RBTreeNode *node) {
     if (child->bt_node.left != NULL && ((struct RBTreeNode *)(child->bt_node.left))->color == RED &&
         child->bt_node.right != NULL && ((struct RBTreeNode *)(child->bt_node.right))->color == RED) {
       child->color = RED;
-      ((struct RBTreeNode *)(child->bt_node.left))->color = BLACK;
-      ((struct RBTreeNode *)(child->bt_node.right))->color = BLACK;
+      RBTREENODE_CAST(child->bt_node.left)->color = BLACK;
+      RBTREENODE_CAST(child->bt_node.right)->color = BLACK;
 
       if (parent == NULL && child->color == RED) {
         child->color = BLACK;
@@ -93,59 +95,138 @@ struct RBTreeNode* RBTree_Insert(struct RBTree *tree, uint64_t hash) {
   return node;
 }
 
-/*static inline void RBTree_InternalRemoveBalance(struct RBTreeNode *node, struct RBTreeNode *parent, struct RBTreeNode *brother) {
+static inline void RBTree_MakeNodeRed(struct RBTree *tree, struct RBTreeNode *node) {
+  if (node->color == RED) {
+    return;
+  }
 
-}*/
+  struct RBTreeNode *parent = node->bt_node.parent;
+  if (parent == NULL) {
+    node->color = RED;
+    return;
+  }
 
-bool RBTree_RemoveNode(struct RBTree *tree, struct RBTreeNode *node) {
-  struct RBTreeNode *del = node, *sub, *child = NULL, *brother = NULL;
-  struct RBTreeNode *parent = node;
-  bool iter_left = false;
-  struct BinaryTreeNode **p = BinaryTree_GetParentUpdatePosition(tree, node);
+  struct RBTreeNode *brother = node->bt_node.parent->left == node ? node->bt_node.right : node->bt_node.left;
+  struct RBTreeNode *bro_left = brother->bt_node.left;
+  struct RBTreeNode *bro_right = brother->bt_node.right;
+  if (bro_left != NULL && bro_left->color == RED) {
+    struct RBTreeNode *top = parent;
+    if (parent->bt_node.left == node) {
+      BinaryTree_DoubleRotate_Left(tree, &top);
+    } else {
+      BinaryTree_SingleRotate_Right(tree, &top);
+      brother->color = RED;
+      bro_left->color = BLACK;
+    }
+    parent->color = BLACK;
+    node->color = RED;
+  } else if (bro_right != NULL && bro_right->color == RED) {
+    struct RBTreeNode *top = parent;
+    if (parent->bt_node.left == node) {
+      BinaryTree_SingleRotate_Left(tree, &top);
+      brother->color = RED;
+      bro_right->color = BLACK;
+    } else {
+      BinaryTree_DoubleRotate_Right(tree, &top);
+    }
+    parent->color = BLACK;
+    node->color = RED;
+  } else {
+    parent->color = BLACK;
+    node->color = RED;
+    brother->color = RED;
+  }
+}
 
-  if (node->bt_node.right == NULL) {
-    if (node->bt_node.left == NULL) {
-      *p = NULL;
+static inline void RBTree_SwapNode(struct RBTreeNode *n1, struct RBTreeNode *n2) {
+  struct RBTreeNode tmp1;
+  struct RBTreeNode tmp2;
+  memcpy(&tmp1, n1, sizeof(tmp1));
+  memcpy(&tmp2, n2, sizeof(tmp2));
+  memcpy(n1, &tmp2, sizeof(tmp2));
+  memcpy(n2, &tmp1, sizeof(tmp1));
+  n1->bt_node.hash = tmp1.bt_node.hash;
+  n2->bt_node.hash = tmp2.bt_node.hash;
+}
+
+/*bool RBTree_RemoveNode(struct RBTree *tree, struct RBTreeNode *node) {
+  if (tree->size == 0 || node == NULL) {
+    return false;
+  } else if (tree->size == 1) {
+    if (node != tree->root) {
+      return false;
+    } else {
+      tree->root = NULL;
       --tree->size;
       return true;
-    } else {
-      child = (struct RBTreeNode *) node->bt_node.left;
-      iter_left = true;
     }
-  } else if (node->bt_node.left == NULL) {
-    child = (struct RBTreeNode *) node->bt_node.right;
-    iter_left = false;
   } else {
-    child = (struct RBTreeNode *) node->bt_node.right;
-    iter_left = false;
-    brother = (struct RBTreeNode *) node->bt_node.left;
+    tree->root->color = RED;
   }
 
-  if (tree->root == parent && child->color == BLACK) {
-    struct RBTreeNode *tmp;
-    if (parent->bt_node.left == child) {
-      BinaryTree_SingleRotate_Left(tree, &tmp);
+  struct RBTreeNode *parent = NULL, *child = tree->root, *brother, *del = NULL, *next;
+  struct RBTreeNode tmp;
+  uint64_t hash = node->bt_node.hash;
+  //bool found = false;
+
+  while (child != NULL) {
+    if (del == NULL) {
+      if (hash == child->bt_node.hash) {
+        if (node != child) {
+          return false;
+        }
+        del = child;
+        if (child->bt_node.left == NULL) {
+          if (child->bt_node.right == NULL) {
+            break;
+          } else {
+            next = child->bt_node.right;
+          }
+        } else {
+          next = child->bt_node.left;
+        }
+      } else {
+        next = child->bt_node.hash < hash ? child->bt_node.left : child->bt_node.right;
+      }
     } else {
-      BinaryTree_SingleRotate_Right(tree, &tmp);
+      if (child->bt_node.hash < del->bt_node.hash) {
+        if (child->bt_node.right == NULL) {
+
+          memcpy(&tmp, child, sizeof(tmp));
+          memcpy(child, del, sizeof(tmp));
+          child->bt_node.hash = tmp.bt_node.hash;
+          next = child->bt_node.left;
+        } else {
+          next = child->bt_node.right;
+        }
+      }
     }
-    tmp->color = BLACK;
-    parent->color = RED;
+
+    if ((child->bt_node.left != NULL && RBTREENODE_CAST(child->bt_node.left)->color == RED) ||
+        (child->bt_node.right!= NULL && RBTREENODE_CAST(child->bt_node.right)->color == RED)) {
+
+    } else {
+      RBTree_MakeNodeRed(tree, child);
+    }
+
+
+    parent = child;
+    child = next;
   }
 
-  while (!(del->bt_node.left == NULL && del->bt_node.right == NULL)) {
-    if (child->color == BLACK) {
-      struct RBTreeNode *left = child->bt_node.left;
-      struct RBTreeNode *right = child->bt_node.right;
-      struct RBTreeNode *bro_left = brother->bt_node.left;
-      struct RBTreeNode *bro_right = brother->bt_node.right;
-      if (left != NULL) {}
-
-      if (left != NULL && left->color) {}
-    }
+  if (del == NULL) {
+    return false;
   }
 
+  RBTree_MakeNodeRed(tree, del);
+  struct BinaryTreeNode **p = BinaryTree_GetParentUpdatePosition(tree, del);
+  *p = NULL;
+
+  done:
+  tree->root->color = BLACK;
+  --tree->size;
   return true;
-}
+}*/
 
 bool RBTree_Check(struct RBTreeNode *node, int *n_black) {
   if (node == NULL) {
@@ -170,3 +251,6 @@ bool RBTree_Check(struct RBTreeNode *node, int *n_black) {
   *n_black = node->color == RED ? nr : nr + 1;
   return true;
 }
+
+
+

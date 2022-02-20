@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include <assert.h>
+
 #include "memory_pool.h"
 #include "binary_tree.h"
 
