@@ -2,8 +2,8 @@
 #include "binary_tree.h"
 #include "rb_tree.h"
 
-int main (int argc, char **argv) {
-  /*struct AVLTree tree;
+void AVLTreeTest(void) {
+  struct AVLTree tree;
   memset(&tree, 0, sizeof(tree));
 
   uint64_t numbers[4096];
@@ -68,8 +68,10 @@ int main (int argc, char **argv) {
   AVLTree_Insert(&tree, 10);
   AVLTree_Insert(&tree, 8);
 
-  AVLTree_RemoveNode(&tree, test);*/
+  AVLTree_RemoveNode(&tree, test);
+}
 
+void RBTreeTest(void) {
   struct RBTree tree;
   memset(&tree, 0, sizeof(tree));
 
@@ -84,6 +86,11 @@ int main (int argc, char **argv) {
       printf("RBTree balance check failed! height:%d\n", n);
     }
   }
+}
+
+int main (int argc, char **argv) {
+  AVLTreeTest();
+  RBTreeTest();
 
   return 0;
 }

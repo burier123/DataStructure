@@ -3,7 +3,7 @@
 #include "utils.h"
 
 struct BinaryTreeNode {
-  uint64_t hash;
+  hash_t hash;
   struct BinaryTreeNode *left;
   struct BinaryTreeNode *right;
   struct BinaryTreeNode *parent;

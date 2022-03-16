@@ -4,11 +4,12 @@
 
 #pragma once
 
+#define MEMORY_POOL_BATCH_NUM 4092
+
 #define CREATE_MEMORY_POOL(TYPE, BATCH_SIZE) \
 static const ssize_t TYPE##_MemoryPool_SINGLE_SIZE = sizeof(struct TYPE) > sizeof(void*) ? \
 sizeof(struct TYPE) : sizeof(void*); \
 struct TYPE##_MemoryBatch { \
-  struct TYPE##_MemoryBatch *next; \
   union { \
     struct TYPE item; \
     struct TYPE *ptr; \
@@ -19,14 +20,13 @@ struct TYPE##_MemoryPool { \
   ssize_t n_free; \
   ssize_t capacity; \
   struct TYPE *free_list_head; \
-  struct TYPE##_MemoryBatch *batch_list; \
+  struct TYPE##_MemoryBatch *batch_list[MEMORY_POOL_BATCH_NUM]; \
 }; \
-static struct TYPE##_MemoryPool TYPE##_pool = {0, 0, 0, NULL, NULL}; \
+static struct TYPE##_MemoryPool TYPE##_pool; \
 bool TYPE##_MemoryBatch_Init(struct TYPE##_MemoryBatch *block) { \
   if (block == NULL) { \
     return false; \
   } \
-  block->next = NULL; \
   for (int i = 0; i < BATCH_SIZE - 1; ++i) { \
     block->data[i].ptr = block->data + i + 1; \
   } \
@@ -35,6 +35,16 @@ bool TYPE##_MemoryBatch_Init(struct TYPE##_MemoryBatch *block) { \
 } \
 bool TYPE##_MemoryPool_Expand(struct TYPE##_MemoryPool *pool) { \
   if (pool == NULL) { \
+    return false; \
+  } \
+  struct TYPE##_MemoryBatch **tmp = NULL; \
+  for (int i = 0; i < MEMORY_POOL_BATCH_NUM; ++i) { \
+    if (pool->batch_list[i] == NULL) { \
+      tmp = &pool->batch_list[i]; \
+      break; \
+    } \
+  } \
+  if (tmp == NULL) { \
     return false; \
   } \
   struct TYPE##_MemoryBatch *new_block = malloc(sizeof(struct TYPE##_MemoryBatch)); \
@@ -47,13 +57,7 @@ bool TYPE##_MemoryPool_Expand(struct TYPE##_MemoryPool *pool) { \
   } \
   new_block->data[BATCH_SIZE - 1].ptr = pool->free_list_head; \
   pool->free_list_head = new_block->data;    \
-  struct TYPE##_MemoryBatch *tmp = pool->batch_list; \
-  if (tmp == NULL) { \
-    pool->batch_list = new_block; \
-  } else { \
-    while (tmp->next != NULL) tmp = tmp->next; \
-    tmp->next = new_block; \
-  } \
+  *tmp = new_block; \
   pool->n_free += BATCH_SIZE; \
   pool->capacity += BATCH_SIZE; \
   return true; \

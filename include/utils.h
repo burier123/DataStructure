@@ -9,3 +9,5 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+
+typedef uint64_t hash_t;
