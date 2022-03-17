@@ -1,6 +1,7 @@
 #include "avl_tree.h"
 #include "binary_tree.h"
 #include "rb_tree.h"
+#include "dict.h"
 
 void AVLTreeTest(void) {
   struct AVLTree tree;
@@ -88,9 +89,46 @@ void RBTreeTest(void) {
   }
 }
 
+void DictTest(void) {
+  struct Dict *dict = Dict_Create();
+  if (dict == NULL) {
+    printf("Create dict failed!");
+    return;
+  }
+
+  Dict_Insert(dict, 127);
+  Dict_Insert(dict, 78537785);
+  Dict_Insert(dict, 122745277);
+  Dict_Insert(dict, 1242717);
+  Dict_Insert(dict, 78);
+  Dict_Insert(dict, 9649649);
+  Dict_Insert(dict, 123123333);
+  Dict_Insert(dict, 3233333);
+  Dict_Insert(dict, 965342);
+  Dict_Insert(dict, 568473);
+  Dict_Insert(dict, 8588558);
+  Dict_Insert(dict, 1636661);
+  Dict_Insert(dict, 774257);
+  Dict_Insert(dict, 52522);
+  Dict_Insert(dict, 6374);
+  Dict_Insert(dict, 8454);
+  for (int i = 0; i < 9996; ++i) {
+    if (!Dict_Insert(dict, i)) {
+      printf("Dict insert failed at:%d\n", i);
+    }
+  }
+
+  Dict_Remove(dict, 1636661);
+  Dict_Remove(dict, 774257);
+  Dict_Remove(dict, 52522);
+  Dict_Remove(dict, 6374);
+  Dict_Remove(dict, 8454);
+}
+
 int main (int argc, char **argv) {
-  AVLTreeTest();
-  RBTreeTest();
+  //AVLTreeTest();
+  //RBTreeTest();
+  DictTest();
 
   return 0;
 }
