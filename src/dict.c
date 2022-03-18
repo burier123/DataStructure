@@ -191,3 +191,36 @@ bool Dict_RemoveEntry(struct Dict *dict, struct DictEntry *entry) {
   --dict->n_used;
   return true;
 }
+
+struct DictEntry *Dict_Find(struct Dict *dict, hash_t hash) {
+  if (dict == NULL) {
+    return NULL;
+  }
+
+  struct DictEntry *ret = dict->entries[hash % dict->size];
+  while (ret != NULL) {
+    if (ret->hash == hash) {
+      return ret;
+    }
+    ret = ret->next;
+  }
+
+  return NULL;
+}
+
+
+bool Dict_FindEntry(struct Dict *dict, struct DictEntry *entry) {
+  if (dict == NULL || entry == NULL) {
+    return false;
+  }
+
+  struct DictEntry *ret = dict->entries[entry->hash % dict->size];
+  while (ret != NULL) {
+    if (ret == entry) {
+      return true;
+    }
+    ret = ret->next;
+  }
+
+  return false;
+}

@@ -123,6 +123,12 @@ void DictTest(void) {
   Dict_Remove(dict, 52522);
   Dict_Remove(dict, 6374);
   Dict_Remove(dict, 8454);
+
+  printf("dict find %d, res: %d\n", 1636661, (Dict_Find(dict, 1636661) != NULL));
+  printf("dict find %d, res: %d\n", 8454, (Dict_Find(dict, 8454) != NULL));
+  printf("dict find %d, res: %d\n", 123123333, (Dict_Find(dict, 123123333) != NULL));
+  printf("dict find %d, res: %d\n", 5656, (Dict_Find(dict, 5656) != NULL));
+  printf("dict find %d, res: %d\n", 123, (Dict_Find(dict, 123) != NULL));
 }
 
 int main (int argc, char **argv) {
