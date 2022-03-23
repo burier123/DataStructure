@@ -2,6 +2,7 @@
 #include "binary_tree.h"
 #include "rb_tree.h"
 #include "dict.h"
+#include "heap.h"
 
 void AVLTreeTest(void) {
   struct AVLTree tree;
@@ -131,10 +132,44 @@ void DictTest(void) {
   printf("dict find %d, res: %d\n", 123, (Dict_Find(dict, 123) != NULL));
 }
 
+void HeapTest(void) {
+  struct Heap *heap = Heap_Create();
+  MaxHeap_Push(heap, 20);
+  MaxHeap_Push(heap, 10);
+  MaxHeap_Push(heap, 5);
+  MaxHeap_Push(heap, 13);
+  MaxHeap_Push(heap, 66);
+  MaxHeap_Push(heap, 2);
+  MaxHeap_Push(heap, 9);
+  MaxHeap_Push(heap, 15);
+  MaxHeap_Push(heap, 12);
+  PrintHeap(heap);
+
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+  (void)MaxHeap_Pop(heap);
+  PrintHeap(heap);
+}
+
 int main (int argc, char **argv) {
   //AVLTreeTest();
   //RBTreeTest();
-  DictTest();
+  //DictTest();
+  HeapTest();
 
   return 0;
 }
