@@ -82,7 +82,17 @@ void RBTreeTest(void) {
   for (int i = 0; i < 4096; ++i) {
     nodes[i] = RBTree_Insert(&tree, rand());
     if (!BinaryTree_Check(tree.root)) {
-      printf("Check failed!\n");
+      printf("BinaryTree Check failed!\n");
+    }
+    if (!RBTree_Check(tree.root, &n)) {
+      printf("RBTree balance check failed! height:%d\n", n);
+    }
+  }
+
+  for (int i = 0; i < 4096; ++i) {
+    RBTree_RemoveNode(&tree, nodes[i]);
+    if (!BinaryTree_Check(tree.root)) {
+      printf("BinaryTree Check failed!\n");
     }
     if (!RBTree_Check(tree.root, &n)) {
       printf("RBTree balance check failed! height:%d\n", n);
@@ -167,9 +177,9 @@ void HeapTest(void) {
 
 int main (int argc, char **argv) {
   //AVLTreeTest();
-  //RBTreeTest();
+  RBTreeTest();
   //DictTest();
-  HeapTest();
+  //HeapTest();
 
   return 0;
 }
